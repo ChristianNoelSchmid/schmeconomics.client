@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { useSignInState } from './lib/services/auth-state';
 
-  const signInState = useSignInState();
-  const router = useRoute();
+const signInState = useSignInState();
+const router = useRoute();
 
-  onMounted(() => {
-    if(!signInState.value && router.path != '/login') 
-      navigateTo('/login');
-  });
+onMounted(() => {
+  if (!signInState.value && router.path != '/login')
+    navigateTo('/login');
+});
 </script>
 
 <template>
