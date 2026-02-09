@@ -41,7 +41,7 @@
                 v-for="account in accounts"
                 :key="account.id"
                 variant="subtle"
-                :to="`/accounts/${account.id}`"
+                to="/"
                 @click="defaultAccountIdStorage=account.name"
             >
                 <template #body>

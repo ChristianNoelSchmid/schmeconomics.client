@@ -23,13 +23,6 @@
       clearAccountState();
   }
 
-  function categoriesRoute() {
-    if(defaultAccountName.value && accountState.value) {
-      const accountId = accountState.value.find(a => a.name == defaultAccountName.value)!.id
-      navigateTo(`/accounts/${accountId}`);
-    }
-  }
-
   const navItems = computed<NavigationMenuItem[]>(() => [
       {
           label: "Transactions",
@@ -74,7 +67,7 @@
 <template>
   <div class="flex-column pb-5 my-4 border-b">
     <div class="flex justify-between my-4">
-      <NuxtLink class="self-center" @click="categoriesRoute()"><h1 class="self-center">Schmeconomics</h1></NuxtLink> 
+      <NuxtLink class="self-center" to="/"><h1 class="self-center">Schmeconomics</h1></NuxtLink> 
       <UButton
         color="neutral"
         variant="subtle"
