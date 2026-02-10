@@ -23,16 +23,18 @@ const emit = defineEmits<{
       </div>
     </template>
 
-    <p>Balance: {{ balance }}</p>
-
-    <template #footer>
-      <div class="flex justify-end space-x-2">
+    <div class="flex justify-between">
+      <p class="self-center text-xl">${{ balance }}</p>
+      <div class="flex flex-col">
         <UButton color="success" variant="ghost" icon="i-heroicons-plus-circle" size="xl" />
         <UButton color="error" variant="ghost" icon="i-heroicons-minus-circle" size="xl" />
-        <UButton v-if="signInState?.userModel.role == Role.Admin" color="warning" variant="ghost"
-          icon="i-heroicons-pencil" size="xl" @click="emit('editclicked')" />
-        <UButton v-if="signInState?.userModel.role == Role.Admin" color="error" variant="ghost" icon="i-heroicons-trash"
-          size="xl" @click="emit('deleteclicked')" />
+      </div>
+    </div>
+
+    <template #footer v-if="signInState?.userModel.role == Role.Admin">
+      <div class="flex justify-end space-x-2">
+        <UButton color="warning" variant="ghost" icon="i-heroicons-pencil" size="xl" @click="emit('editclicked')" />
+        <UButton color="error" variant="ghost" icon="i-heroicons-trash" size="xl" @click="emit('deleteclicked')" />
       </div>
     </template>
   </UCard>
