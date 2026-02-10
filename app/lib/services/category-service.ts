@@ -1,4 +1,4 @@
-import { CategoryApi, type CreateCategoryRequest } from "../openapi";
+import { CategoryApi, type CreateCategoryRequest, type UpdateCategoryRequest } from "../openapi";
 import { useAccountState, useDefaultAccountName } from "./account-service";
 import { getApiConfiguration } from "./auth-state";
 
@@ -29,6 +29,14 @@ export class CategoryService {
             await api.categoryCreatePost({ createCategoryRequest: request });
         } catch (error) {
             console.error('Failed to create category:', error);
+        }
+    }
+    async updateCategory(categoryId: string, request: UpdateCategoryRequest) {
+        try {
+            const api = new CategoryApi(getApiConfiguration(true));
+            await api.categoryUpdateIdPut({ id: categoryId, updateCategoryRequest: request });
+        } catch (error) {
+            console.error('Failed to update category:', error);
         }
     }
     async deleteCategory(categoryId: string) {

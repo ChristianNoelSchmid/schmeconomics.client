@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import type { FormError } from '@nuxt/ui';
-import type { CreateCategoryRequest } from '~/lib/openapi';
+import type { CreateCategoryRequest, CategoryModel } from '~/lib/openapi';
 
 const props = defineProps<{
   accountId: string,
-  visible: boolean
+  visible: boolean,
+  categoryToEdit?: CategoryModel | null
 }>();
 
 const emit = defineEmits<{
@@ -13,9 +14,9 @@ const emit = defineEmits<{
 }>();
 
 const newCategoryState = reactive({
-  name: '',
-  balance: 0,
-  refillValue: 0
+  name: props.categoryToEdit?.name || '',
+  balance: props.categoryToEdit?.balance || 0,
+  refillValue: props.categoryToEdit?.refillValue || 0
 });
 
 type Schema = typeof newCategoryState;
@@ -39,6 +40,19 @@ function submitRequest() {
   newCategoryState.balance = 0;
   newCategoryState.refillValue = 0;
 }
+
+// Reset form when category to edit changes
+watch(() => props.categoryToEdit, (newVal) => {
+  if (newVal) {
+    newCategoryState.name = newVal.name || '';
+    newCategoryState.balance = newVal.balance || 0;
+    newCategoryState.refillValue = newVal.refillValue || 0;
+  } else {
+    newCategoryState.name = '';
+    newCategoryState.balance = 0;
+    newCategoryState.refillValue = 0;
+  }
+}, { immediate: true });
 </script>
 
 <template>
@@ -46,7 +60,7 @@ function submitRequest() {
     <template #content>
       <UCard>
         <template #header>
-          <h3 class="text-lg font-semibold">Create New Category</h3>
+          <h3 class="text-lg font-semibold">{{ props.categoryToEdit ? 'Edit Category' : 'Create New Category' }}</h3>
         </template>
 
         <UForm class="space-y-4" :state="newCategoryState" :validate="validate">
@@ -69,7 +83,7 @@ function submitRequest() {
               Cancel
             </UButton>
             <UButton color="primary" variant="solid" @click="submitRequest">
-              Create
+              {{ props.categoryToEdit ? 'Update' : 'Create' }}
             </UButton>
           </div>
         </template>

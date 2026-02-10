@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { CategoryApi, Role, type CategoryModel, type CreateCategoryRequest } from '~/lib/openapi';
+import { CategoryApi, Role, type CategoryModel, type CreateCategoryRequest, type UpdateCategoryRequest } from '~/lib/openapi';
 import { useAccountState, useDefaultAccountName } from '~/lib/services/account-service';
 import { getApiConfiguration, useSignInState } from '~/lib/services/auth-state';
 import { ref, watch } from 'vue';
@@ -14,6 +14,8 @@ const defaultAccountName = useDefaultAccountName();
 const categories = ref<CategoryModel[]>([]);
 const loading = ref(true);
 const showCreateCategoryModal = ref(false);
+const showEditCategoryModal = ref(false);
+const editingCategory = ref<CategoryModel | null>(null);
 const categoryService = new CategoryService();
 
 async function loadCategories() {
@@ -65,6 +67,14 @@ async function createCategory(request: CreateCategoryRequest) {
   loadCategories();
 }
 
+async function updateCategory(request: UpdateCategoryRequest) {
+  if (!editingCategory.value) return;
+
+  await categoryService.updateCategory(editingCategory.value.id, request);
+  showEditCategoryModal.value = false;
+  loadCategories();
+}
+
 
 async function deleteCategory(categoryId: string) {
   if (!confirm('Are you sure you want to delete this category?')) {
@@ -73,6 +83,11 @@ async function deleteCategory(categoryId: string) {
 
   await categoryService.deleteCategory(categoryId);
   loadCategories();
+}
+
+function handleEditCategory(category: CategoryModel) {
+  editingCategory.value = category;
+  showEditCategoryModal.value = true;
 }
 </script>
 
@@ -94,12 +109,16 @@ async function deleteCategory(categoryId: string) {
     <!-- Categories list -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
       <CategoryCard v-for="category in categories" :key="category.id" :category="category"
-        @deleteclicked="deleteCategory(category.id)" />
+        @deleteclicked="deleteCategory(category.id)" @editclicked="handleEditCategory(category)" />
     </div>
 
     <!-- Modal page to create categories -->
     <CreateCategoryModal :account-id="account?.id ?? ''" :visible="showCreateCategoryModal"
       @submitted="createCategory($event)" @closed="showCreateCategoryModal = false" />
+
+    <!-- Modal page to edit categories -->
+    <CreateCategoryModal :account-id="account?.id ?? ''" :visible="showEditCategoryModal"
+      :category-to-edit="editingCategory" @submitted="updateCategory($event)" @closed="showEditCategoryModal = false" />
 
   </div>
 </template>

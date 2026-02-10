@@ -1,6 +1,5 @@
 <script setup lang="ts">
 const model = defineModel<number>();
-model.value = 0;
 
 const formattedValue = computed<string>(() => {
   if (!model.value) return '0.00';

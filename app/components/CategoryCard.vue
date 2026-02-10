@@ -11,6 +11,7 @@ const balance = computed(() => currencyFormat(props.category.balance));
 
 const emit = defineEmits<{
   deleteclicked: []
+  editclicked: []
 }>();
 </script>
 
@@ -28,6 +29,8 @@ const emit = defineEmits<{
       <div class="flex justify-end space-x-2">
         <UButton color="success" variant="ghost" icon="i-heroicons-plus-circle" size="xl" />
         <UButton color="error" variant="ghost" icon="i-heroicons-minus-circle" size="xl" />
+        <UButton v-if="signInState?.userModel.role == Role.Admin" color="warning" variant="ghost"
+          icon="i-heroicons-pencil" size="xl" @click="emit('editclicked')" />
         <UButton v-if="signInState?.userModel.role == Role.Admin" color="error" variant="ghost" icon="i-heroicons-trash"
           size="xl" @click="emit('deleteclicked')" />
       </div>
