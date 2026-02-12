@@ -4,6 +4,7 @@ import { useAccountState, useDefaultAccountName } from '~/lib/services/account-s
 import { getApiConfiguration, useSignInState } from '~/lib/services/auth-state';
 import { ref, watch } from 'vue';
 import { CategoryService } from '~/lib/services/category-service';
+import { TransactionService } from '~/lib/services/transaction-service';
 
 const signInState = useSignInState();
 const accountState = useAccountState();
@@ -15,8 +16,11 @@ const categories = ref<CategoryModel[]>([]);
 const loading = ref(true);
 const showCreateCategoryModal = ref(false);
 const showEditCategoryModal = ref(false);
+const showCreateTransactionModal = ref(false);
 const editingCategory = ref<CategoryModel | null>(null);
+const selectedCategoryForTransaction = ref<CategoryModel | null>(null);
 const categoryService = new CategoryService();
+const transactionService = new TransactionService();
 
 async function loadCategories() {
   if (!accountState.value || !defaultAccountName.value) {
@@ -89,6 +93,24 @@ function handleEditCategory(category: CategoryModel) {
   editingCategory.value = category;
   showEditCategoryModal.value = true;
 }
+
+function handleCreateTransaction(category: CategoryModel) {
+  selectedCategoryForTransaction.value = category;
+  showCreateTransactionModal.value = true;
+}
+
+async function createTransaction(amount: number, isAddition: boolean) {
+  if (!selectedCategoryForTransaction.value) return;
+
+  try {
+    await transactionService.createTransaction(selectedCategoryForTransaction.value.id, amount, isAddition);
+    showCreateTransactionModal.value = false;
+    loadCategories();
+  } catch (error) {
+    console.error('Failed to create transaction:', error);
+    alert('Failed to create transaction');
+  }
+}
 </script>
 
 <template>
@@ -109,7 +131,8 @@ function handleEditCategory(category: CategoryModel) {
     <!-- Categories list -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
       <CategoryCard v-for="category in categories" :key="category.id" :category="category"
-        @deleteclicked="deleteCategory(category.id)" @editclicked="handleEditCategory(category)" />
+        @deleteclicked="deleteCategory(category.id)" @editclicked="handleEditCategory(category)"
+        @transactionclicked="handleCreateTransaction(category)" />
     </div>
 
     <!-- Modal page to create categories -->
@@ -119,6 +142,12 @@ function handleEditCategory(category: CategoryModel) {
     <!-- Modal page to edit categories -->
     <CreateCategoryModal :account-id="account?.id ?? ''" :visible="showEditCategoryModal"
       :category-to-edit="editingCategory" @submitted="updateCategory($event)" @closed="showEditCategoryModal = false" />
+
+    <!-- Modal page to create transactions -->
+    <CreateTransactionModal :visible="showCreateTransactionModal"
+      :category-id="selectedCategoryForTransaction?.id ?? ''"
+      :category-name="selectedCategoryForTransaction?.name ?? ''" @submitted="createTransaction($event[0], $event[1])"
+      @closed="showCreateTransactionModal = false" />
 
   </div>
 </template>

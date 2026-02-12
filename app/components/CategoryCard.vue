@@ -12,6 +12,7 @@ const balance = computed(() => currencyFormat(props.category.balance));
 const emit = defineEmits<{
   deleteclicked: []
   editclicked: []
+  transactionclicked: [category: CategoryModel]
 }>();
 </script>
 
@@ -26,8 +27,10 @@ const emit = defineEmits<{
     <div class="flex justify-between">
       <p class="self-center text-xl">${{ balance }}</p>
       <div class="flex flex-col">
-        <UButton color="success" variant="ghost" icon="i-heroicons-plus-circle" size="xl" />
-        <UButton color="error" variant="ghost" icon="i-heroicons-minus-circle" size="xl" />
+        <UButton color="success" variant="ghost" icon="i-heroicons-plus-circle" size="xl"
+          @click="emit('transactionclicked', props.category)" />
+        <UButton color="error" variant="ghost" icon="i-heroicons-minus-circle" size="xl"
+          @click="emit('transactionclicked', props.category)" />
       </div>
     </div>
 
